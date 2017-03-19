@@ -23,6 +23,7 @@ public class Pair <L, R>
     public boolean equal(Pair Comp)
     {return Left.equals(Comp.Left) && Right.equals(Comp.Right);}
     
+    @Override
     public String toString()
     {return Left.toString() + " " + Right.toString();}
 }
