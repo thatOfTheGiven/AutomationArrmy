@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package lieutenant;
+package Utilities;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -46,22 +46,24 @@ public class UDPServer implements Runnable
                 Socket.receive(packet);
                 
                 DatagramSocket ShiftSocket = new DatagramSocket();
-
-                UDPClient Client = new UDPClient(ShiftSocket, packet);
+                UDPClient Client = new UDPClient(ShiftSocket, packet.getPort(), packet.getAddress());
                 
                 if(end)
+                {
+                    Client.send("Breakingdown");
                     break;
+                }
                 
                 Client.send("Connected");
                
                 Mon.push(Client);
                 
             }
-        } catch (SocketException ex) {
-            Logger.getLogger(UDPServer.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(UDPServer.class.getName()).log(Level.SEVERE, null, ex);
-        }    
+        } 
+        catch (SocketException ex) 
+        {Logger.getLogger(UDPServer.class.getName()).log(Level.SEVERE, null, ex);} 
+        catch (IOException ex) 
+        {Logger.getLogger(UDPServer.class.getName()).log(Level.SEVERE, null, ex);}    
     } 
     
     public void stop()
@@ -69,10 +71,10 @@ public class UDPServer implements Runnable
         end=true;
         try 
         {
-            UDPClient Client = new UDPClient("localhost", Port);
+            UDPClient Client = new UDPClient("127.0.0.1", Port);
             Client.Connect();          
-        } catch (UnknownHostException ex) {
-            Logger.getLogger(UDPServer.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        } 
+        catch (UnknownHostException ex) 
+        {Logger.getLogger(UDPServer.class.getName()).log(Level.SEVERE, null, ex);}
     }
 }

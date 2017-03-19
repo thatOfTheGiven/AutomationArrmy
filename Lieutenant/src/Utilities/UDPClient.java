@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package lieutenant;
+package Utilities;
 
 /**
  *
@@ -16,7 +16,6 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,55 +26,6 @@ public class UDPClient
     private int Port;
     private DatagramSocket Socket   = null;            
     
-    
-    public void main(String[] ARGS)
-    {
-        Scanner scan = new Scanner(System.in);
-        
-        String Address;
-        int Port;
-        String MSG ="";
-        
-        System.out.print("What the address? ");
-        Address=scan.next();
-        
-        System.out.println("What the port? ");
-        Port=scan.nextInt();
-        
-        UDPClient Client = null;
-        try
-        {Client = new UDPClient(Address, Port);}
-        catch (UnknownHostException ex)
-        {
-            System.out.println("Failed to host exception.");
-            System.exit(0);
-        }
-        
-        if(Client.Connect())
-        {
-            System.out.println("Send Message to host. (ends when you have a line just with'.'");
-            String line = "";
-            while(!line.equals("."))
-            {
-                line = line.equals("") ? "" : line + "\n";
-                MSG += line;
-                line += scan.next();
-            }
-            
-            try 
-            {
-                Client.send(MSG);
-                System.out.println(Client.recieve());
-            } 
-            catch (IOException ex) 
-            {Logger.getLogger(UDPClient.class.getName()).log(Level.SEVERE, null, ex);}
-            
-            Client.Disconnect();
-        }
-     }
-    
-    
-    
     public UDPClient(String Address, int Port) throws UnknownHostException
     {
         this.Port=Port;
@@ -83,10 +33,10 @@ public class UDPClient
     }
     
     
-    public UDPClient(DatagramSocket Socket, DatagramPacket packet)
+    public UDPClient(DatagramSocket Socket, int Port, InetAddress Address)
     {
-        this.Port=packet.getPort();
-        inetAddress = packet.getAddress();
+        this.Port=Port;
+        inetAddress = Address;
         this.Socket=Socket;
     }
     
@@ -101,7 +51,7 @@ public class UDPClient
         
         try { 
             Socket = new DatagramSocket();
-            Socket.setSoTimeout(180000);
+            Socket.setSoTimeout(18000);
             
             packet = new DatagramPacket(buf, buf.length, 
                                 inetAddress, Port);
@@ -111,6 +61,8 @@ public class UDPClient
             packet = new DatagramPacket(buf, buf.length);
             Socket.receive(packet);
             String received = new String(packet.getData(), 0, packet.getLength());
+            received = received.trim();
+                     
             
             if(!received.equals("Connected"))
             {
@@ -119,7 +71,6 @@ public class UDPClient
             }
             
             Port = packet.getPort();
-
         } catch (java.net.SocketTimeoutException | SocketException | UnknownHostException ex) {
             Logger.getLogger(UDPClient.class.getName()).log(Level.SEVERE, null, ex);
             Socket.close();
@@ -146,7 +97,7 @@ public class UDPClient
         DatagramPacket packet;
         
         byte[] dataMSG = MSG.getBytes();
-        int start = 0;
+        int Position = 0;
         
         do
         {
@@ -154,19 +105,19 @@ public class UDPClient
             
             for(int i = 0; i < buf.length; i++)
             {
-                if(start >= dataMSG.length)
+                if(Position >= dataMSG.length)
                     break;
                 
-                
-                buf[i] = dataMSG[start];
-                start++;                 
+                buf[i] = dataMSG[Position];
+                Position++;
             }
             
             packet = new DatagramPacket(buf, buf.length, 
                                 inetAddress, Port);
+            
             Socket.send(packet);
             
-        } while(start < dataMSG.length);
+        } while(Position < dataMSG.length);
         
         byte[] buf = new byte[512];
         packet = new DatagramPacket(buf, buf.length, 
@@ -180,13 +131,15 @@ public class UDPClient
         
         String Result   = "";
         String received;
+        String Test;
         
         byte[] buf = new byte[512];
         
         do 
         {       
             packet = new DatagramPacket(buf, buf.length);
-            try {
+            try 
+            {
                 Socket.receive(packet);
                 received = new String(packet.getData(), 0, packet.getLength());
             } 
@@ -195,10 +148,11 @@ public class UDPClient
                 Logger.getLogger(UDPClient.class.getName()).log(Level.SEVERE, null, ex);
                 break;
             }
-            
+
             Result += received;
-        } while(!received.equals(""));
+            Test = received.trim();
+        } while(!Test.equals(""));
         
-         return Result;
+         return Result.trim();
     }
 }

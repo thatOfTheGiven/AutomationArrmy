@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package lieutenant;
+package Utilities;
 
 import java.util.ArrayList;
 
@@ -52,4 +52,21 @@ public class Monitor <K>
         
         return result;
     }
+    
+    public synchronized int size()
+    { return queue.size();}
+    
+    public synchronized K get (int position)
+    {return queue.get(position);}
+    
+    public synchronized K remove(int position)
+    {
+        K result = queue.get(position);
+        queue.remove(position);
+        
+        return result;
+    }
+    
+    public synchronized void insert(int position, K value)
+    {queue.add(position, value);}
 }
