@@ -54,7 +54,7 @@ public class Monitor <K>
     }
     
     public synchronized int size()
-    { return queue.size();}
+    {return queue.size();}
     
     public synchronized K get (int position)
     {return queue.get(position);}

@@ -8,6 +8,8 @@ package Utilities;
 /**
  *
  * @author Andrew
+ * @param <L>
+ * @param <R>
  */
 public class Pair <L, R>
 {
